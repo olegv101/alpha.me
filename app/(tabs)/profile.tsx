@@ -1,11 +1,15 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
+import { useFonts } from 'expo-font';
 import { Image } from 'expo-image';
+import * as SplashScreen from 'expo-splash-screen';
+import { useCallback } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFonts } from '@expo-google-fonts/space-mono/useFonts'
-import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono/400Regular'
 
+// Prevent the splash screen from auto-hiding
+SplashScreen.preventAutoHideAsync();
 
 // Mock data
 const student = {
@@ -44,10 +48,24 @@ const needs = [
 ];
 
 export default function ProfileScreen() {
-  let [fontsLoaded] = useFonts({ SpaceMono_400Regular });
+  const [fontsLoaded, fontError] = useFonts({
+    SpaceMono_400Regular,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      // Hide the splash screen once fonts are loaded
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  // Don't render anything until fonts are loaded
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} onLayout={onLayoutRootView}>
       <ThemedView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           {/* Student Header */}
@@ -64,7 +82,7 @@ export default function ProfileScreen() {
           </ThemedView>
 
           {/* Investors Section */}
-          <ThemedView style={styles.section}>
+          <ThemedView style={[styles.section, {borderColor: '#E5E7EB'}]}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
               Investors
             </ThemedText>
@@ -79,7 +97,7 @@ export default function ProfileScreen() {
           </ThemedView>
 
           {/* Projects & Thoughts Section */}
-          <ThemedView style={styles.section}>
+          <ThemedView style={[styles.section, {borderColor: '#E5E7EB'}]}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
               Projects & Thoughts
             </ThemedText>
@@ -102,7 +120,7 @@ export default function ProfileScreen() {
           </ThemedView>
 
           {/* Needs Section */}
-          <ThemedView style={styles.section}>
+          <ThemedView style={[styles.section, { marginBottom: 50, borderColor: '#E5E7EB' }]}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
               Needs & Support
             </ThemedText>
@@ -158,7 +176,6 @@ const styles = StyleSheet.create({
   section: {
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
   },
   sectionTitle: {
     fontSize: 18,
