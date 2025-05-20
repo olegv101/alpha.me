@@ -3,9 +3,10 @@ import { ThemedView } from '@/components/ThemedView';
 import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono';
 import { useFonts } from 'expo-font';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useCallback } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Prevent the splash screen from auto-hiding
@@ -41,10 +42,26 @@ const thoughts = [
 ];
 
 const needs = [
-  'Need engineer with ML expertise',
-  'Need Claude Credits for large-scale text processing',
-  'Need space for upcoming demo in San Francisco',
-  'Need angel investor with experience in EdTech',
+  {
+    id: 1,
+    text: 'Need engineer with ML expertise',
+    supporters: [0, 2], // Index of investors who support this need
+  },
+  {
+    id: 2,
+    text: 'Need Claude Credits for large-scale text processing',
+    supporters: [1],
+  },
+  {
+    id: 3,
+    text: 'Need space for upcoming demo in San Francisco',
+    supporters: [],
+  },
+  {
+    id: 4,
+    text: 'Need angel investor with experience in EdTech',
+    supporters: [3, 4],
+  },
 ];
 
 export default function ProfileScreen() {
@@ -63,6 +80,13 @@ export default function ProfileScreen() {
   if (!fontsLoaded && !fontError) {
     return null;
   }
+
+  const navigateToBountyDetail = (need: string) => {
+    router.push({
+      pathname: '/bounty-detail',
+      params: { need },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} onLayout={onLayoutRootView}>
@@ -126,9 +150,34 @@ export default function ProfileScreen() {
             </ThemedText>
             <ThemedView style={styles.listContainer}>
               {needs.map((need, index) => (
-                <ThemedView key={index} style={styles.needItem}>
-                  <ThemedText style={styles.needText}>{need}</ThemedText>
-                </ThemedView>
+                <Pressable 
+                  key={index} 
+                  style={styles.needItemContainer}
+                  onPress={() => navigateToBountyDetail(need.text)}
+                >
+                  <ThemedView style={styles.needItem}>
+                    <ThemedText style={styles.needText}>{need.text}</ThemedText>
+                    
+                    {need.supporters.length > 0 && (
+                      <View style={styles.supportersContainer}>
+                        {need.supporters.map((supporterIndex, i) => (
+                          <View 
+                            key={i} 
+                            style={[
+                              styles.supporterAvatar, 
+                              { marginLeft: i > 0 ? -10 : 0 }
+                            ]} 
+                          />
+                        ))}
+                        {need.supporters.length > 0 && (
+                          <ThemedText style={styles.supportersCount}>
+                            {need.supporters.length}
+                          </ThemedText>
+                        )}
+                      </View>
+                    )}
+                  </ThemedView>
+                </Pressable>
               ))}
             </ThemedView>
           </ThemedView>
@@ -233,14 +282,39 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: '#6B7280',
   },
+  needItemContainer: {
+    width: '100%',
+  },
   needItem: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 12,
     borderWidth: 1,
     borderColor: '#E5E7EB',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   needText: {
     fontSize: 16,
+    flex: 1,
+  },
+  supportersContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  supporterAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#0a7ea4',
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  supportersCount: {
+    fontSize: 14,
+    marginLeft: 4,
+    color: '#6B7280',
   },
 }); 
