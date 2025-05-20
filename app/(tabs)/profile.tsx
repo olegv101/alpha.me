@@ -3,6 +3,9 @@ import { ThemedView } from '@/components/ThemedView';
 import { Image } from 'expo-image';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFonts } from '@expo-google-fonts/space-mono/useFonts'
+import { SpaceMono_400Regular } from '@expo-google-fonts/space-mono/400Regular'
+
 
 // Mock data
 const student = {
@@ -41,6 +44,8 @@ const needs = [
 ];
 
 export default function ProfileScreen() {
+  let [fontsLoaded] = useFonts({ SpaceMono_400Regular });
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ThemedView style={styles.container}>
@@ -158,6 +163,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     marginBottom: 16,
+    fontFamily: "SpaceMono_400Regular" 
   },
   investorsList: {
     flexDirection: 'row',
